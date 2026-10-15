@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
 
 st.set_page_config(
     page_title="Instant Auto-EDA Dashboard", page_icon="📊", layout="wide"
@@ -10,7 +9,7 @@ st.set_page_config(
 st.title("📊 Instant Auto-EDA & Dataset Dashboard")
 st.write(
     "Upload any CSV or Excel file below to automatically generate a complete"
-    " analytical dashboard, correlation matrix, and data quality report."
+    " analytical dashboard and report."
 )
 
 # File uploader supports CSV and Excel
@@ -28,7 +27,7 @@ if uploaded_file is not None:
 
   df = load_data(uploaded_file)
 
-  # Display basic dataset info
+  # Display basic dataset metrics
   st.success("Dataset successfully loaded!")
   
   col1, col2, col3 = st.columns(3)
@@ -42,16 +41,13 @@ if uploaded_file is not None:
 
   # Generate Automated Profiling Report
   st.subheader("📈 Automated Deep-Dive Dashboard")
-  with st.spinner(
-      "Generating comprehensive dashboard insights (this may take a few"
-      " seconds)..."
-  ):
+  with st.spinner("Generating comprehensive dashboard insights..."):
     # Create the profiling report
     pr = ProfileReport(df, explorative=True, minimal=True)
-    # Render it inside Streamlit
-    st_profile_report(pr)
+    report_html = pr.to_html()
+    
+    # Render the HTML report inside Streamlit safely
+    st.components.v1.html(report_html, height=1000, scrolling=True)
 
 else:
-  st.info(
-      "👆 Upload a dataset file above to instantly generate your dashboard."
-  )
+  st.info("👆 Upload a dataset file above to instantly generate your dashboard.")
